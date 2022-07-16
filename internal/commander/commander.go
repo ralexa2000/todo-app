@@ -41,18 +41,18 @@ func (c *Commander) Run() error {
 			continue
 		}
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
+		userName := update.Message.From.UserName
 		if cmd := update.Message.Command(); cmd != "" {
 			switch cmd {
 			case listCmd:
-				msg.Text = listFunc()
+				msg.Text = listFunc(userName)
 			default:
 				msg.Text = UnknownCommand.Error()
 			}
 		} else {
-			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+			log.Printf("[%s] %s", userName, update.Message.Text)
 			msg.Text = fmt.Sprintf("you sent me <%v>", update.Message.Text)
 		}
-		msg.ReplyToMessageID = update.Message.MessageID
 		_, err := c.bot.Send(msg)
 		if err != nil {
 			return errors.Wrap(err, "send message to bot")
@@ -61,8 +61,8 @@ func (c *Commander) Run() error {
 	return nil
 }
 
-func listFunc() string {
-	data := storage.List()
+func listFunc(userName string) string {
+	data := storage.List(userName)
 	res := make([]string, 0, len(data))
 	for _, t := range data {
 		res = append(res, t.String())

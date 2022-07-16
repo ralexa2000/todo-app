@@ -13,16 +13,22 @@ var TaskNotExists = errors.New("task does not exist")
 
 func init() {
 	data = make(map[uint]*Task)
-	t, _ := NewTask("ralexa", "create telegram bot in go", "2022-07-24")
-	if err := Add(t); err != nil {
+	t1, _ := NewTask("ralexa2000", "create telegram bot in go", "2022-07-24")
+	if err := Add(t1); err != nil {
+		log.Panic(err)
+	}
+	t2, _ := NewTask("other_user", "create telegram bot in go", "2022-07-24")
+	if err := Add(t2); err != nil {
 		log.Panic(err)
 	}
 }
 
-func List() []*Task {
+func List(userName string) []*Task {
 	res := make([]*Task, 0, len(data))
 	for _, t := range data {
-		res = append(res, t)
+		if t.user == userName {
+			res = append(res, t)
+		}
 	}
 	return res
 }

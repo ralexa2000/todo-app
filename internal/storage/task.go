@@ -23,11 +23,12 @@ func NewTask(user, task, dueDate string) (*Task, error) {
 		return nil, err
 	}
 	lastId++
+	t.id = lastId
 	return &t, nil
 }
 
 func (t *Task) String() string {
-	return fmt.Sprintf("%d: [%v] [till %v] %v", t.id, t.user, t.dueDate, t.task)
+	return fmt.Sprintf("[id %d] [till %v] %v", t.id, t.dueDate, t.task)
 }
 
 func (t *Task) SetUser(user string) error {
