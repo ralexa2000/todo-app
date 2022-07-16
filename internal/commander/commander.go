@@ -5,12 +5,20 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/pkg/errors"
 	"gitlab.ozon.dev/ralexa2000/todo-bot/config"
+	"gitlab.ozon.dev/ralexa2000/todo-bot/internal/storage"
 	"log"
+	"strings"
+)
+
+const (
+	listCmd = "list"
 )
 
 type Commander struct {
 	bot *tgbotapi.BotAPI
 }
+
+var UnknownCommand = errors.New("unknown command")
 
 func Init() (*Commander, error) {
 	bot, err := tgbotapi.NewBotAPI(config.ApiKey)
@@ -29,18 +37,35 @@ func (c *Commander) Run() error {
 	updates := c.bot.GetUpdatesChan(u)
 
 	for update := range updates {
-		if update.Message != nil {
-			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
-			msg.Text = fmt.Sprintf("you sent me <%v>", update.Message.Text)
-			msg.ReplyToMessageID = update.Message.MessageID
-
-			_, err := c.bot.Send(msg)
-			if err != nil {
-				return errors.Wrap(err, "send message to bot")
+		if update.Message == nil {
+			continue
+		}
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
+		if cmd := update.Message.Command(); cmd != "" {
+			switch cmd {
+			case listCmd:
+				msg.Text = listFunc()
+			default:
+				msg.Text = UnknownCommand.Error()
 			}
+		} else {
+			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+			msg.Text = fmt.Sprintf("you sent me <%v>", update.Message.Text)
+		}
+		msg.ReplyToMessageID = update.Message.MessageID
+		_, err := c.bot.Send(msg)
+		if err != nil {
+			return errors.Wrap(err, "send message to bot")
 		}
 	}
 	return nil
+}
+
+func listFunc() string {
+	data := storage.List()
+	res := make([]string, 0, len(data))
+	for _, t := range data {
+		res = append(res, t.String())
+	}
+	return strings.Join(res, "\n")
 }
