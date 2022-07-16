@@ -7,11 +7,13 @@ import (
 	"gitlab.ozon.dev/ralexa2000/todo-bot/config"
 	"gitlab.ozon.dev/ralexa2000/todo-bot/internal/storage"
 	"log"
+	"regexp"
 	"strings"
 )
 
 const (
 	listCmd = "list"
+	addCmd  = "add"
 )
 
 type Commander struct {
@@ -19,6 +21,7 @@ type Commander struct {
 }
 
 var UnknownCommand = errors.New("unknown command")
+var BadArgument = errors.New("bad argument")
 
 func Init() (*Commander, error) {
 	bot, err := tgbotapi.NewBotAPI(config.ApiKey)
@@ -46,6 +49,8 @@ func (c *Commander) Run() error {
 			switch cmd {
 			case listCmd:
 				msg.Text = listFunc(userName)
+			case addCmd:
+				msg.Text = addFunc(userName, update.Message.Text)
 			default:
 				msg.Text = UnknownCommand.Error()
 			}
@@ -68,4 +73,22 @@ func listFunc(userName string) string {
 		res = append(res, t.String())
 	}
 	return strings.Join(res, "\n")
+}
+
+func addFunc(userName, inputString string) string {
+	re := regexp.MustCompile(`^/add (\d{4}-\d{2}-\d{2}) (.+)$`)
+	matched := re.FindStringSubmatch(inputString)
+	log.Printf("%q\n", matched)
+	if len(matched) != 3 {
+		return BadArgument.Error()
+	}
+	t, err := storage.NewTask(userName, matched[2], matched[1])
+	if err != nil {
+		return err.Error()
+	}
+	err = storage.Add(t)
+	if err != nil {
+		return err.Error()
+	}
+	return "task added"
 }
