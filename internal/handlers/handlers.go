@@ -13,11 +13,35 @@ import (
 var BadArgument = errors.New("bad argument")
 var NoAccess = errors.New("no access to task")
 
+const (
+	helpCmd    = "help"
+	helpHelp   = "/help - list all commands"
+	listCmd    = "list"
+	listHelp   = "/list - list all current tasks"
+	addCmd     = "add"
+	addHelp    = "/add <due_date> <task> - add a new task, due date: YYYY-MM-DD"
+	updateCmd  = "update"
+	updateHelp = "/update <task_id> <due_date> <task> - update task with id, due date: YYYY-MM-DD"
+	deleteCmd  = "delete"
+	deleteHelp = "/delete <task_id> - delete task with id"
+)
+
 func AddHandlers(c *commander.Commander) {
-	c.RegisterHandler("list", listFunc)
-	c.RegisterHandler("add", addFunc)
-	c.RegisterHandler("update", updateFunc)
-	c.RegisterHandler("delete", deleteFunc)
+	c.RegisterHandler(helpCmd, helpFunc)
+	c.RegisterHandler(listCmd, listFunc)
+	c.RegisterHandler(addCmd, addFunc)
+	c.RegisterHandler(updateCmd, updateFunc)
+	c.RegisterHandler(deleteCmd, deleteFunc)
+}
+
+func helpFunc(_, _ string) string {
+	return strings.Join([]string{
+		helpHelp,
+		listHelp,
+		addHelp,
+		updateHelp,
+		deleteHelp,
+	}, "\n")
 }
 
 func listFunc(userName, _ string) string {
