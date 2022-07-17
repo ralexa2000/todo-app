@@ -2,7 +2,7 @@ package storage
 
 import "fmt"
 
-var lastId = uint(0)
+var lastIds = make(map[string]uint)
 
 type Task struct {
 	id      uint
@@ -22,8 +22,11 @@ func NewTask(user, task, dueDate string) (*Task, error) {
 	if err := t.SetDueDate(dueDate); err != nil {
 		return nil, err
 	}
-	lastId++
-	t.id = lastId
+	if _, ok := lastIds[user]; !ok {
+		lastIds[user] = 0
+	}
+	lastIds[user]++
+	t.id = lastIds[user]
 	return &t, nil
 }
 

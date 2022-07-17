@@ -11,7 +11,6 @@ import (
 )
 
 var BadArgument = errors.New("bad argument")
-var NoAccess = errors.New("no access to task")
 
 const (
 	helpCmd    = "help"
@@ -83,12 +82,9 @@ func updateFunc(userName, inputString string) string {
 		return BadArgument.Error()
 	}
 	id, _ := strconv.ParseUint(matched[1], 10, 64)
-	t, err := storage.GetById(uint(id))
+	t, err := storage.Get(userName, uint(id))
 	if err != nil {
 		return err.Error()
-	}
-	if t.GetUser() != userName {
-		return NoAccess.Error()
 	}
 	if err = t.SetTask(matched[3]); err != nil {
 		return err.Error()
@@ -110,12 +106,9 @@ func deleteFunc(userName, inputString string) string {
 		return BadArgument.Error()
 	}
 	id, _ := strconv.ParseUint(matched[1], 10, 64)
-	t, err := storage.GetById(uint(id))
+	t, err := storage.Get(userName, uint(id))
 	if err != nil {
 		return err.Error()
-	}
-	if t.GetUser() != userName {
-		return NoAccess.Error()
 	}
 	if err = storage.Delete(t); err != nil {
 		return err.Error()
