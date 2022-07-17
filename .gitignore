@@ -1,2 +1,2 @@
 .idea
-ApiKey.go
+config/config.go
