@@ -5,27 +5,21 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/pkg/errors"
 	"gitlab.ozon.dev/ralexa2000/todo-bot/config"
-	"gitlab.ozon.dev/ralexa2000/todo-bot/internal/storage"
 	"log"
-	"regexp"
-	"strconv"
-	"strings"
 )
 
-const (
-	listCmd   = "list"
-	addCmd    = "add"
-	updateCmd = "update"
-	deleteCmd = "delete"
-)
+type CmdHandler func(string, string) string
 
 type Commander struct {
-	bot *tgbotapi.BotAPI
+	bot   *tgbotapi.BotAPI
+	route map[string]CmdHandler
 }
 
 var UnknownCommand = errors.New("unknown command")
-var BadArgument = errors.New("bad argument")
-var NoAccess = errors.New("no access to task")
+
+func (c *Commander) RegisterHandler(cmd string, handler CmdHandler) {
+	c.route[cmd] = handler
+}
 
 func Init() (*Commander, error) {
 	bot, err := tgbotapi.NewBotAPI(config.ApiKey)
@@ -34,7 +28,10 @@ func Init() (*Commander, error) {
 	}
 	bot.Debug = true
 	log.Printf("Authorized on account %s", bot.Self.UserName)
-	return &Commander{bot: bot}, nil
+	return &Commander{
+		bot:   bot,
+		route: make(map[string]CmdHandler),
+	}, nil
 }
 
 func (c *Commander) Run() error {
@@ -50,16 +47,9 @@ func (c *Commander) Run() error {
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
 		userName := update.Message.From.UserName
 		if cmd := update.Message.Command(); cmd != "" {
-			switch cmd {
-			case listCmd:
-				msg.Text = listFunc(userName)
-			case addCmd:
-				msg.Text = addFunc(userName, update.Message.Text)
-			case updateCmd:
-				msg.Text = updateFunc(userName, update.Message.Text)
-			case deleteCmd:
-				msg.Text = deleteFunc(userName, update.Message.Text)
-			default:
+			if handler, ok := c.route[cmd]; ok {
+				msg.Text = handler(userName, update.Message.Text)
+			} else {
 				msg.Text = UnknownCommand.Error()
 			}
 		} else {
@@ -72,83 +62,4 @@ func (c *Commander) Run() error {
 		}
 	}
 	return nil
-}
-
-func listFunc(userName string) string {
-	data := storage.List(userName)
-	res := make([]string, 0, len(data))
-	for _, t := range data {
-		res = append(res, t.String())
-	}
-	outString := strings.Join(res, "\n")
-	if outString == "" {
-		outString = "no tasks, add some with /add command"
-	}
-	return outString
-}
-
-func addFunc(userName, inputString string) string {
-	re := regexp.MustCompile(`^/add (\d{4}-\d{2}-\d{2}) (.+)$`)
-	matched := re.FindStringSubmatch(inputString)
-	log.Printf("%q\n", matched)
-	if len(matched) != 3 {
-		return BadArgument.Error()
-	}
-	t, err := storage.NewTask(userName, matched[2], matched[1])
-	if err != nil {
-		return err.Error()
-	}
-	err = storage.Add(t)
-	if err != nil {
-		return err.Error()
-	}
-	return "task added"
-}
-
-func updateFunc(userName, inputString string) string {
-	re := regexp.MustCompile(`^/update (\d+) (\d{4}-\d{2}-\d{2}) (.+)$`)
-	matched := re.FindStringSubmatch(inputString)
-	log.Printf("%q\n", matched)
-	if len(matched) != 4 {
-		return BadArgument.Error()
-	}
-	id, _ := strconv.ParseUint(matched[1], 10, 64)
-	t, err := storage.GetById(uint(id))
-	if err != nil {
-		return err.Error()
-	}
-	if t.GetUser() != userName {
-		return NoAccess.Error()
-	}
-	if err = t.SetTask(matched[3]); err != nil {
-		return err.Error()
-	}
-	if err = t.SetDueDate(matched[2]); err != nil {
-		return err.Error()
-	}
-	if err = storage.Update(t); err != nil {
-		return err.Error()
-	}
-	return "task updated"
-}
-
-func deleteFunc(userName, inputString string) string {
-	re := regexp.MustCompile(`^/delete (\d+)$`)
-	matched := re.FindStringSubmatch(inputString)
-	log.Printf("%q\n", matched)
-	if len(matched) != 2 {
-		return BadArgument.Error()
-	}
-	id, _ := strconv.ParseUint(matched[1], 10, 64)
-	t, err := storage.GetById(uint(id))
-	if err != nil {
-		return err.Error()
-	}
-	if t.GetUser() != userName {
-		return NoAccess.Error()
-	}
-	if err = storage.Delete(t); err != nil {
-		return err.Error()
-	}
-	return "task deleted"
 }
