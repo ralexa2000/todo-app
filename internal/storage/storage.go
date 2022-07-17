@@ -3,6 +3,7 @@ package storage
 import (
 	"github.com/pkg/errors"
 	"log"
+	"sort"
 	"strconv"
 )
 
@@ -33,6 +34,10 @@ func List(userName string) []*Task {
 			res = append(res, t)
 		}
 	}
+	sort.SliceStable(res, func(i, j int) bool {
+		return res[i].dueDate < res[j].dueDate ||
+			(res[i].dueDate == res[j].dueDate && res[i].id < res[j].id)
+	})
 	return res
 }
 
