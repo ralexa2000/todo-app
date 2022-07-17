@@ -30,7 +30,7 @@ func List(userName string) []*Task {
 	}
 	res := make([]*Task, 0, len(data[userName]))
 	for _, t := range data[userName] {
-		if t.user == userName {
+		if t.GetUser() == userName {
 			res = append(res, t)
 		}
 	}
@@ -53,10 +53,10 @@ func Get(userName string, id uint) (*Task, error) {
 }
 
 func Add(t *Task) error {
-	tasks, ok := data[t.user]
+	tasks, ok := data[t.GetUser()]
 	if !ok {
-		data[t.user] = make(map[uint]*Task)
-		tasks = data[t.user]
+		data[t.GetUser()] = make(map[uint]*Task)
+		tasks = data[t.GetUser()]
 	}
 	if _, ok := tasks[t.GetId()]; ok {
 		return errors.Wrap(TaskExists, strconv.FormatUint(uint64(t.GetId()), 10))
@@ -66,7 +66,7 @@ func Add(t *Task) error {
 }
 
 func Update(t *Task) error {
-	tasks, ok := data[t.user]
+	tasks, ok := data[t.GetUser()]
 	if !ok {
 		return errors.Wrap(TaskNotExists, strconv.FormatUint(uint64(t.GetId()), 10))
 	}
@@ -78,7 +78,7 @@ func Update(t *Task) error {
 }
 
 func Delete(t *Task) error {
-	tasks, ok := data[t.user]
+	tasks, ok := data[t.GetUser()]
 	if !ok {
 		return errors.Wrap(TaskNotExists, strconv.FormatUint(uint64(t.GetId()), 10))
 	}
