@@ -8,12 +8,14 @@ import (
 	"gitlab.ozon.dev/ralexa2000/todo-bot/internal/storage"
 	"log"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
 const (
-	listCmd = "list"
-	addCmd  = "add"
+	listCmd   = "list"
+	addCmd    = "add"
+	updateCmd = "update"
 )
 
 type Commander struct {
@@ -22,6 +24,7 @@ type Commander struct {
 
 var UnknownCommand = errors.New("unknown command")
 var BadArgument = errors.New("bad argument")
+var NoAccess = errors.New("no access to task")
 
 func Init() (*Commander, error) {
 	bot, err := tgbotapi.NewBotAPI(config.ApiKey)
@@ -51,6 +54,8 @@ func (c *Commander) Run() error {
 				msg.Text = listFunc(userName)
 			case addCmd:
 				msg.Text = addFunc(userName, update.Message.Text)
+			case updateCmd:
+				msg.Text = updateFunc(userName, update.Message.Text)
 			default:
 				msg.Text = UnknownCommand.Error()
 			}
@@ -91,4 +96,29 @@ func addFunc(userName, inputString string) string {
 		return err.Error()
 	}
 	return "task added"
+}
+
+func updateFunc(userName, inputString string) string {
+	re := regexp.MustCompile(`^/update (\d+) (\d{4}-\d{2}-\d{2}) (.+)$`)
+	matched := re.FindStringSubmatch(inputString)
+	log.Printf("%q\n", matched)
+	if len(matched) != 4 {
+		return BadArgument.Error()
+	}
+	id, _ := strconv.ParseUint(matched[1], 10, 64)
+	t, err := storage.GetById(uint(id))
+	if err != nil {
+		return err.Error()
+	}
+	if t.GetUser() != userName {
+		return NoAccess.Error()
+	}
+	if err = t.SetTask(matched[3]); err != nil {
+		return err.Error()
+	}
+	if err = t.SetDueDate(matched[2]); err != nil {
+		return err.Error()
+	}
+	err = storage.Update(t)
+	return "task updated"
 }

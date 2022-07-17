@@ -33,6 +33,13 @@ func List(userName string) []*Task {
 	return res
 }
 
+func GetById(id uint) (*Task, error) {
+	if _, ok := data[id]; !ok {
+		return nil, errors.Wrap(TaskNotExists, strconv.FormatUint(uint64(id), 10))
+	}
+	return data[id], nil
+}
+
 func Add(t *Task) error {
 	if _, ok := data[t.GetId()]; ok {
 		return errors.Wrap(TaskExists, strconv.FormatUint(uint64(t.GetId()), 10))
