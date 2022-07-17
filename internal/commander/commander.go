@@ -54,7 +54,7 @@ func (c *Commander) Run() error {
 			}
 		} else {
 			log.Printf("[%s] %s", userName, update.Message.Text)
-			msg.Text = fmt.Sprintf("you sent me <%v>", update.Message.Text)
+			msg.Text = fmt.Sprintf("you sent me <%v>\n\n%v", update.Message.Text, c.route["help"]("", ""))
 		}
 		_, err := c.bot.Send(msg)
 		if err != nil {
