@@ -50,7 +50,7 @@ func (c *Commander) Run() error {
 			if handler, ok := c.route[cmd]; ok {
 				msg.Text = handler(userName, update.Message.Text)
 			} else {
-				msg.Text = UnknownCommand.Error()
+				msg.Text = UnknownCommand.Error() + "\n\n" + c.route["help"]("", "")
 			}
 		} else {
 			log.Printf("[%s] %s", userName, update.Message.Text)
