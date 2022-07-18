@@ -8,7 +8,7 @@ import (
 	"log"
 )
 
-type CmdHandler func(string, string) string
+type CmdHandler func(...string) string
 
 type Commander struct {
 	bot   *tgbotapi.BotAPI
@@ -50,11 +50,11 @@ func (c *Commander) Run() error {
 			if handler, ok := c.route[cmd]; ok {
 				msg.Text = handler(userName, update.Message.Text)
 			} else {
-				msg.Text = UnknownCommand.Error() + "\n\n" + c.route["help"]("", "")
+				msg.Text = UnknownCommand.Error() + "\n\n" + c.route["help"]()
 			}
 		} else {
 			log.Printf("[%s] %s", userName, update.Message.Text)
-			msg.Text = fmt.Sprintf("you sent me <%v>\n\n%v", update.Message.Text, c.route["help"]("", ""))
+			msg.Text = fmt.Sprintf("you sent me <%v>\n\n%v", update.Message.Text, c.route["help"]())
 		}
 		_, err := c.bot.Send(msg)
 		if err != nil {

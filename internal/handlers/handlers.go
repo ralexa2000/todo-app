@@ -39,7 +39,7 @@ func AddHandlers(c *commander.Commander) {
 	c.RegisterHandler(deleteCmd, deleteFunc)
 }
 
-func helpFunc(_, _ string) string {
+func helpFunc(_ ...string) string {
 	return strings.Join([]string{
 		helpHelp,
 		listHelp,
@@ -49,7 +49,8 @@ func helpFunc(_, _ string) string {
 	}, "\n")
 }
 
-func listFunc(userName, _ string) string {
+func listFunc(args ...string) string {
+	userName := args[0]
 	data := storage.List(userName)
 	res := make([]string, 0, len(data))
 	for _, t := range data {
@@ -62,7 +63,8 @@ func listFunc(userName, _ string) string {
 	return outString
 }
 
-func addFunc(userName, inputString string) string {
+func addFunc(args ...string) string {
+	userName, inputString := args[0], args[1]
 	matched := reAdd.FindStringSubmatch(inputString)
 	log.Printf("%q\n", matched)
 	if len(matched) != 3 {
@@ -79,7 +81,8 @@ func addFunc(userName, inputString string) string {
 	return "task added"
 }
 
-func updateFunc(userName, inputString string) string {
+func updateFunc(args ...string) string {
+	userName, inputString := args[0], args[1]
 	matched := reUpdate.FindStringSubmatch(inputString)
 	log.Printf("%q\n", matched)
 	if len(matched) != 4 {
@@ -102,7 +105,8 @@ func updateFunc(userName, inputString string) string {
 	return "task updated"
 }
 
-func deleteFunc(userName, inputString string) string {
+func deleteFunc(args ...string) string {
+	userName, inputString := args[0], args[1]
 	matched := reDelete.FindStringSubmatch(inputString)
 	log.Printf("%q\n", matched)
 	if len(matched) != 2 {
