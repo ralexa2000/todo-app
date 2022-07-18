@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"github.com/pkg/errors"
 	"gitlab.ozon.dev/ralexa2000/todo-bot/internal/commander"
 	"gitlab.ozon.dev/ralexa2000/todo-bot/internal/storage"
 	"log"
@@ -10,7 +9,7 @@ import (
 	"strings"
 )
 
-var BadArgument = errors.New("bad argument")
+var badArgumentError = "bad argument"
 
 const (
 	helpCmd    = "help"
@@ -68,7 +67,7 @@ func addFunc(args ...string) string {
 	matched := reAdd.FindStringSubmatch(inputString)
 	log.Printf("%q\n", matched)
 	if len(matched) != 3 {
-		return BadArgument.Error()
+		return badArgumentError
 	}
 	t, err := storage.NewTask(userName, matched[2], matched[1])
 	if err != nil {
@@ -86,7 +85,7 @@ func updateFunc(args ...string) string {
 	matched := reUpdate.FindStringSubmatch(inputString)
 	log.Printf("%q\n", matched)
 	if len(matched) != 4 {
-		return BadArgument.Error()
+		return badArgumentError
 	}
 	id, _ := strconv.ParseUint(matched[1], 10, 64)
 	t, err := storage.Get(userName, uint(id))
@@ -110,7 +109,7 @@ func deleteFunc(args ...string) string {
 	matched := reDelete.FindStringSubmatch(inputString)
 	log.Printf("%q\n", matched)
 	if len(matched) != 2 {
-		return BadArgument.Error()
+		return badArgumentError
 	}
 	id, _ := strconv.ParseUint(matched[1], 10, 64)
 	t, err := storage.Get(userName, uint(id))

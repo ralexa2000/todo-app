@@ -15,7 +15,7 @@ type Commander struct {
 	route map[string]CmdHandler
 }
 
-var UnknownCommand = errors.New("unknown command")
+var unknownCommandError = "unknown command"
 
 func (c *Commander) RegisterHandler(cmd string, handler CmdHandler) {
 	c.route[cmd] = handler
@@ -50,7 +50,7 @@ func (c *Commander) Run() error {
 			if handler, ok := c.route[cmd]; ok {
 				msg.Text = handler(userName, update.Message.Text)
 			} else {
-				msg.Text = fmt.Sprintf("%s\n\n%s", UnknownCommand.Error(), c.route["help"]())
+				msg.Text = fmt.Sprintf("%s\n\n%s", unknownCommandError, c.route["help"]())
 			}
 		} else {
 			log.Printf("[%s] %s", userName, update.Message.Text)
