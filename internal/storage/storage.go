@@ -22,9 +22,7 @@ func List(userName string) []*Task {
 	}
 	res := make([]*Task, 0, len(tasks))
 	for _, t := range tasks {
-		if t.GetUser() == userName {
-			res = append(res, t)
-		}
+		res = append(res, t)
 	}
 	sort.SliceStable(res, func(i, j int) bool {
 		return res[i].dueDate < res[j].dueDate ||
