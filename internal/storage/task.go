@@ -32,12 +32,12 @@ func NewTask(user, task, dueDate string) (*Task, error) {
 }
 
 func (t *Task) String() string {
-	return fmt.Sprintf("[id %d] [till %v] %v", t.id, t.dueDate, t.task)
+	return fmt.Sprintf("[id %d] [till %s] %s", t.id, t.dueDate, t.task)
 }
 
 func (t *Task) SetUser(user string) error {
 	if len(user) < 3 || len(user) > 10 {
-		return fmt.Errorf("bad user name length <%v>", user)
+		return fmt.Errorf("bad user name length <%s>", user)
 	}
 	t.user = user
 	return nil
@@ -45,7 +45,7 @@ func (t *Task) SetUser(user string) error {
 
 func (t *Task) SetTask(task string) error {
 	if len(task) == 0 || len(task) > 100 {
-		return fmt.Errorf("bad task length <%v>", task)
+		return fmt.Errorf("bad task length <%s>", task)
 	}
 	t.task = task
 	return nil
@@ -53,7 +53,7 @@ func (t *Task) SetTask(task string) error {
 
 func (t *Task) SetDueDate(dueDate string) error {
 	if len(dueDate) != 10 {
-		return fmt.Errorf("bad dueDate length <%v>", dueDate)
+		return fmt.Errorf("bad dueDate length <%s>", dueDate)
 	}
 	t.dueDate = dueDate
 	return nil
