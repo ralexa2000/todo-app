@@ -16,11 +16,12 @@ func init() {
 }
 
 func List(userName string) []*Task {
-	if _, ok := data[userName]; !ok {
+	tasks, ok := data[userName]
+	if !ok {
 		return []*Task{}
 	}
-	res := make([]*Task, 0, len(data[userName]))
-	for _, t := range data[userName] {
+	res := make([]*Task, 0, len(tasks))
+	for _, t := range tasks {
 		if t.GetUser() == userName {
 			res = append(res, t)
 		}
