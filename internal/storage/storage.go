@@ -2,7 +2,6 @@ package storage
 
 import (
 	"github.com/pkg/errors"
-	"log"
 	"sort"
 	"strconv"
 )
@@ -14,14 +13,6 @@ var TaskNotExists = errors.New("task does not exist")
 
 func init() {
 	data = make(map[string]map[uint]*Task)
-	t1, _ := NewTask("ralexa2000", "create telegram bot in go", "2022-07-24")
-	if err := Add(t1); err != nil {
-		log.Panic(err)
-	}
-	t2, _ := NewTask("other_user", "create telegram bot in go", "2022-07-24")
-	if err := Add(t2); err != nil {
-		log.Panic(err)
-	}
 }
 
 func List(userName string) []*Task {
