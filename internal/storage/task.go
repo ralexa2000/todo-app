@@ -23,9 +23,10 @@ func NewTask(user, task, dueDate string) (*Task, error) {
 		return nil, err
 	}
 	if _, ok := lastIds[user]; !ok {
-		lastIds[user] = 0
+		lastIds[user] = 1
+	} else {
+		lastIds[user]++
 	}
-	lastIds[user]++
 	t.id = lastIds[user]
 	return &t, nil
 }
