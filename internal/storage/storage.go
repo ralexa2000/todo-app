@@ -54,25 +54,21 @@ func Add(t *Task) error {
 }
 
 func Update(t *Task) error {
-	tasks, ok := data[t.GetUser()]
-	if !ok {
-		return errors.Wrap(TaskNotExists, strconv.FormatUint(uint64(t.GetId()), 10))
+	if tasks, ok := data[t.GetUser()]; ok {
+		if _, ok := tasks[t.GetId()]; ok {
+			tasks[t.GetId()] = t
+			return nil
+		}
 	}
-	if _, ok := tasks[t.GetId()]; !ok {
-		return errors.Wrap(TaskNotExists, strconv.FormatUint(uint64(t.GetId()), 10))
-	}
-	tasks[t.GetId()] = t
-	return nil
+	return errors.Wrap(TaskNotExists, strconv.FormatUint(uint64(t.GetId()), 10))
 }
 
 func Delete(t *Task) error {
-	tasks, ok := data[t.GetUser()]
-	if !ok {
-		return errors.Wrap(TaskNotExists, strconv.FormatUint(uint64(t.GetId()), 10))
+	if tasks, ok := data[t.GetUser()]; ok {
+		if _, ok := tasks[t.GetId()]; ok {
+			delete(tasks, t.GetId())
+			return nil
+		}
 	}
-	if _, ok := tasks[t.GetId()]; !ok {
-		return errors.Wrap(TaskNotExists, strconv.FormatUint(uint64(t.GetId()), 10))
-	}
-	delete(tasks, t.GetId())
-	return nil
+	return errors.Wrap(TaskNotExists, strconv.FormatUint(uint64(t.GetId()), 10))
 }
