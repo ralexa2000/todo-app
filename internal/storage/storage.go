@@ -32,14 +32,12 @@ func List(userName string) []*Task {
 }
 
 func Get(userName string, id uint) (*Task, error) {
-	tasks, ok := data[userName]
-	if !ok {
-		return nil, errors.Wrap(TaskNotExists, strconv.FormatUint(uint64(id), 10))
+	if tasks, ok := data[userName]; ok {
+		if _, ok := tasks[id]; ok {
+			return tasks[id], nil
+		}
 	}
-	if _, ok := tasks[id]; !ok {
-		return nil, errors.Wrap(TaskNotExists, strconv.FormatUint(uint64(id), 10))
-	}
-	return tasks[id], nil
+	return nil, errors.Wrap(TaskNotExists, strconv.FormatUint(uint64(id), 10))
 }
 
 func Add(t *Task) error {
