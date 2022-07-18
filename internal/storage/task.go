@@ -1,6 +1,9 @@
 package storage
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 var lastIds = make(map[string]uint)
 
@@ -8,8 +11,10 @@ type Task struct {
 	id      uint
 	user    string
 	task    string
-	dueDate string
+	dueDate time.Time
 }
+
+const layoutISO = "2006-01-02"
 
 func NewTask(user, task, dueDate string) (*Task, error) {
 	t := Task{}
@@ -32,7 +37,7 @@ func NewTask(user, task, dueDate string) (*Task, error) {
 }
 
 func (t *Task) String() string {
-	return fmt.Sprintf("[id %d] [till %s] %s", t.id, t.dueDate, t.task)
+	return fmt.Sprintf("[id %d] [till %s] %s", t.GetId(), t.GetDueDate(), t.GetTask())
 }
 
 func (t *Task) SetUser(user string) error {
@@ -52,10 +57,11 @@ func (t *Task) SetTask(task string) error {
 }
 
 func (t *Task) SetDueDate(dueDate string) error {
-	if len(dueDate) != 10 {
-		return fmt.Errorf("bad dueDate length <%s>", dueDate)
+	dueDateParsed, err := time.Parse(layoutISO, dueDate)
+	if err != nil {
+		return fmt.Errorf("bad dueDate <%s>", dueDate)
 	}
-	t.dueDate = dueDate
+	t.dueDate = dueDateParsed
 	return nil
 }
 
@@ -72,5 +78,5 @@ func (t *Task) GetTask() string {
 }
 
 func (t *Task) GetDueDate() string {
-	return t.dueDate
+	return t.dueDate.Format(layoutISO)
 }

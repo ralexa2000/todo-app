@@ -25,8 +25,8 @@ func List(userName string) []*Task {
 		res = append(res, t)
 	}
 	sort.SliceStable(res, func(i, j int) bool {
-		return res[i].dueDate < res[j].dueDate ||
-			(res[i].dueDate == res[j].dueDate && res[i].id < res[j].id)
+		return res[i].GetDueDate() < res[j].GetDueDate() ||
+			(res[i].GetDueDate() == res[j].GetDueDate() && res[i].GetId() < res[j].GetId())
 	})
 	return res
 }
