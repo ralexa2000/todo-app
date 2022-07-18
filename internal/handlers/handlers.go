@@ -25,6 +25,12 @@ const (
 	deleteHelp = "/delete <task_id> - delete task with id"
 )
 
+var (
+	reAdd    = regexp.MustCompile(`^/add (\d{4}-\d{2}-\d{2}) (.+)$`)
+	reUpdate = regexp.MustCompile(`^/update (\d+) (\d{4}-\d{2}-\d{2}) (.+)$`)
+	reDelete = regexp.MustCompile(`^/delete (\d+)$`)
+)
+
 func AddHandlers(c *commander.Commander) {
 	c.RegisterHandler(helpCmd, helpFunc)
 	c.RegisterHandler(listCmd, listFunc)
@@ -57,8 +63,7 @@ func listFunc(userName, _ string) string {
 }
 
 func addFunc(userName, inputString string) string {
-	re := regexp.MustCompile(`^/add (\d{4}-\d{2}-\d{2}) (.+)$`)
-	matched := re.FindStringSubmatch(inputString)
+	matched := reAdd.FindStringSubmatch(inputString)
 	log.Printf("%q\n", matched)
 	if len(matched) != 3 {
 		return BadArgument.Error()
@@ -75,8 +80,7 @@ func addFunc(userName, inputString string) string {
 }
 
 func updateFunc(userName, inputString string) string {
-	re := regexp.MustCompile(`^/update (\d+) (\d{4}-\d{2}-\d{2}) (.+)$`)
-	matched := re.FindStringSubmatch(inputString)
+	matched := reUpdate.FindStringSubmatch(inputString)
 	log.Printf("%q\n", matched)
 	if len(matched) != 4 {
 		return BadArgument.Error()
@@ -99,8 +103,7 @@ func updateFunc(userName, inputString string) string {
 }
 
 func deleteFunc(userName, inputString string) string {
-	re := regexp.MustCompile(`^/delete (\d+)$`)
-	matched := re.FindStringSubmatch(inputString)
+	matched := reDelete.FindStringSubmatch(inputString)
 	log.Printf("%q\n", matched)
 	if len(matched) != 2 {
 		return BadArgument.Error()
