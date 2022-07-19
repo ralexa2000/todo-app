@@ -9,10 +9,10 @@ import (
 func main() {
 	c, err := commander.Init()
 	if err != nil {
-		log.Panic(err)
+		log.Fatal(err)
 	}
 	handlers.AddHandlers(c)
 	if err := c.Run(); err != nil {
-		log.Panic(err)
+		log.Fatal(err)
 	}
 }
