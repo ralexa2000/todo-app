@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-var reAdd = regexp.MustCompile(`^/add (\d{4}-\d{2}-\d{2}) (.+)$`)
+var regexpAdd = regexp.MustCompile(`^/add (\d{4}-\d{2}-\d{2}) (.+)$`)
 var lastIds = make(map[string]uint)
 
 const layoutISO = "2006-01-02"
@@ -31,16 +31,16 @@ func (c *command) Name() string {
 }
 
 func (c *command) Arguments() string {
-	return "<due_date> <task>"
+	return "<due_date:YYYY-MM-DD> <task>"
 }
 
 func (c *command) Description() string {
-	return "add a new task, due date: YYYY-MM-DD"
+	return "add a new task"
 }
 
 func (c *command) Process(userName string, inputString string) string {
 	// parse inputString into arguments
-	matched := reAdd.FindStringSubmatch(inputString)
+	matched := regexpAdd.FindStringSubmatch(inputString)
 	log.Printf("%q\n", matched)
 	if len(matched) != 3 {
 		return "invalid args"
@@ -73,5 +73,6 @@ func (c *command) Process(userName string, inputString string) string {
 		log.Printf("Internal Error: %s", err.Error())
 		return "internal error"
 	}
+
 	return "task added"
 }

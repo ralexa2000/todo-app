@@ -25,15 +25,6 @@ type cache struct {
 	data map[string]map[uint]models.Task
 }
 
-//func (c *cache) Get(userName string, id uint) (models.Task, error) {
-//	if tasks, ok := c.data[userName]; ok {
-//		if _, ok := tasks[id]; ok {
-//			return tasks[id], nil
-//		}
-//	}
-//	return nil, errors.Wrapf(ErrTaskNotExists, "task_id: [%d]", id)
-//}
-
 func (c *cache) Create(task models.Task) error {
 	tasks, ok := c.data[task.User]
 	if !ok {
@@ -81,6 +72,15 @@ func (c *cache) Delete(task models.Task) error {
 		}
 	}
 	return errors.Wrapf(ErrTaskNotExists, "task_id: [%d]", task.Id)
+}
+
+func (c *cache) Get(userName string, taskId uint) (models.Task, error) {
+	if tasks, ok := c.data[userName]; ok {
+		if _, ok := tasks[taskId]; ok {
+			return tasks[taskId], nil
+		}
+	}
+	return models.Task{}, errors.Wrapf(ErrTaskNotExists, "task_id: [%d]", taskId)
 }
 
 func (c *cache) String(task models.Task) string {
