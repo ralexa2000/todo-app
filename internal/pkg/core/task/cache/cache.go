@@ -9,4 +9,5 @@ type Interface interface {
 	Update(task models.Task) error
 	List(userName string) []models.Task
 	Delete(task models.Task) error
+	String(task models.Task) string
 }

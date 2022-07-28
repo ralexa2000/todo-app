@@ -1,6 +1,7 @@
 package local
 
 import (
+	"fmt"
 	"github.com/pkg/errors"
 	cachePkg "gitlab.ozon.dev/ralexa2000/todo-bot/internal/pkg/core/task/cache"
 	"gitlab.ozon.dev/ralexa2000/todo-bot/internal/pkg/core/task/models"
@@ -11,6 +12,8 @@ var (
 	ErrTaskExists    = errors.New("task exists")
 	ErrTaskNotExists = errors.New("task does not exist")
 )
+
+const layoutISO = "2006-01-02"
 
 func New() cachePkg.Interface {
 	return &cache{
@@ -78,4 +81,8 @@ func (c *cache) Delete(task models.Task) error {
 		}
 	}
 	return errors.Wrapf(ErrTaskNotExists, "task_id: [%d]", task.Id)
+}
+
+func (c *cache) String(task models.Task) string {
+	return fmt.Sprintf("[id %d] [till %s] %s", task.Id, task.DueDate.Format(layoutISO), task.Task)
 }

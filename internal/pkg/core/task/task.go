@@ -16,6 +16,7 @@ type Interface interface {
 	Update(task models.Task) error
 	List(userName string) []models.Task
 	Delete(task models.Task) error
+	String(task models.Task) string
 }
 
 func New() Interface {
@@ -60,4 +61,8 @@ func (c *core) Delete(task models.Task) error {
 		return errors.Wrap(ErrValidation, "field: [user] cannot be empty")
 	}
 	return c.cache.Delete(task)
+}
+
+func (c *core) String(task models.Task) string {
+	return c.cache.String(task)
 }
