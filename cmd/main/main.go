@@ -3,6 +3,7 @@ package main
 import (
 	botPkg "gitlab.ozon.dev/ralexa2000/todo-bot/internal/pkg/bot"
 	cmdAddPkg "gitlab.ozon.dev/ralexa2000/todo-bot/internal/pkg/bot/command/add"
+	cmdDeletePkg "gitlab.ozon.dev/ralexa2000/todo-bot/internal/pkg/bot/command/delete"
 	cmdHelpPkg "gitlab.ozon.dev/ralexa2000/todo-bot/internal/pkg/bot/command/help"
 	cmdListPkg "gitlab.ozon.dev/ralexa2000/todo-bot/internal/pkg/bot/command/list"
 	cmdUpdatePkg "gitlab.ozon.dev/ralexa2000/todo-bot/internal/pkg/bot/command/update"
@@ -29,10 +30,14 @@ func main() {
 		commandUpdate := cmdUpdatePkg.New(task)
 		bot.RegisterHandler(commandUpdate)
 
+		commandDelete := cmdDeletePkg.New(task)
+		bot.RegisterHandler(commandDelete)
+
 		commandHelp := cmdHelpPkg.New(map[string][2]string{
 			commandAdd.Name():    {commandAdd.Arguments(), commandAdd.Description()},
 			commandList.Name():   {commandList.Arguments(), commandList.Description()},
 			commandUpdate.Name(): {commandUpdate.Arguments(), commandUpdate.Description()},
+			commandDelete.Name(): {commandDelete.Arguments(), commandDelete.Description()},
 		})
 		bot.RegisterHandler(commandHelp)
 	}
