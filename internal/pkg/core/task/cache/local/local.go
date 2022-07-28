@@ -6,6 +6,7 @@ import (
 	cachePkg "gitlab.ozon.dev/ralexa2000/todo-bot/internal/pkg/core/task/cache"
 	"gitlab.ozon.dev/ralexa2000/todo-bot/internal/pkg/core/task/models"
 	"sort"
+	"sync"
 )
 
 var (
@@ -17,15 +18,20 @@ const layoutISO = "2006-01-02"
 
 func New() cachePkg.Interface {
 	return &cache{
+		mu:   sync.RWMutex{},
 		data: map[string]map[uint]models.Task{},
 	}
 }
 
 type cache struct {
+	mu   sync.RWMutex
 	data map[string]map[uint]models.Task
 }
 
 func (c *cache) Create(task models.Task) error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	tasks, ok := c.data[task.User]
 	if !ok {
 		c.data[task.User] = make(map[uint]models.Task)
@@ -39,6 +45,9 @@ func (c *cache) Create(task models.Task) error {
 }
 
 func (c *cache) Update(task models.Task) error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	if tasks, ok := c.data[task.User]; ok {
 		if _, ok := tasks[task.Id]; ok {
 			tasks[task.Id] = task
@@ -49,6 +58,9 @@ func (c *cache) Update(task models.Task) error {
 }
 
 func (c *cache) List(userName string) []models.Task {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
 	tasks, ok := c.data[userName]
 	if !ok {
 		return []models.Task{}
@@ -65,6 +77,9 @@ func (c *cache) List(userName string) []models.Task {
 }
 
 func (c *cache) Delete(task models.Task) error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	if tasks, ok := c.data[task.User]; ok {
 		if _, ok := tasks[task.Id]; ok {
 			delete(tasks, task.Id)
@@ -75,6 +90,9 @@ func (c *cache) Delete(task models.Task) error {
 }
 
 func (c *cache) Get(userName string, taskId uint) (models.Task, error) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
 	if tasks, ok := c.data[userName]; ok {
 		if _, ok := tasks[taskId]; ok {
 			return tasks[taskId], nil
