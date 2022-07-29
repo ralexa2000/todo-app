@@ -12,6 +12,10 @@ import (
 )
 
 func main() {
+	runGRPCServer()
+}
+
+func runBot() {
 	var task taskPkg.Interface
 	{
 		task = taskPkg.New()

@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package ozon.dev.mc2.api;
+option go_package = "gitlab.ozon.dev/ralexa2000/todo-main/pkg/api;api";
+
+import "google/api/annotations.proto";
+
+service Admin {
+  rpc TaskCreate(TaskCreateRequest) returns (TaskCreateResponse) {}
+  rpc TaskList(TaskListRequest) returns (TaskListResponse) {}
+  rpc TaskUpdate(TaskUpdateRequest) returns (TaskUpdateResponse) {}
+  rpc TaskDelete(TaskDeleteRequest) returns (TaskDeleteResponse) {}
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// TaskCreate endpoint messages
+// ---------------------------------------------------------------------------------------------------------------------
+
+message TaskCreateRequest {
+  string user    = 1;
+  string task    = 2;
+  string dueDate = 3;
+}
+message TaskCreateResponse {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// TaskList endpoint messages
+// ---------------------------------------------------------------------------------------------------------------------
+
+message TaskListRequest {}
+message TaskListResponse {
+  repeated Task Tasks = 1;
+
+  message Task {
+    uint64 taskId  = 1;
+    string user    = 2;
+    string task    = 3;
+    string dueDate = 4;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// TaskUpdate endpoint messages
+// ---------------------------------------------------------------------------------------------------------------------
+
+message TaskUpdateRequest {
+  uint64 taskId  = 1;
+  string user    = 2;
+  string task    = 3;
+  string dueDate = 4;
+}
+message TaskUpdateResponse {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// TaskDelete endpoint messages
+// ---------------------------------------------------------------------------------------------------------------------
+
+message TaskDeleteRequest {
+  uint64 taskId = 1;
+}
+message TaskDeleteResponse {}
