@@ -9,10 +9,14 @@ import (
 	pb "gitlab.ozon.dev/ralexa2000/todo-bot/pkg/api"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"sync"
 	"time"
 )
 
-var lastIds = make(map[string]uint)
+var (
+	lastIds   = make(map[string]uint)
+	muLastIds = sync.RWMutex{}
+)
 
 const layoutISO = "2006-01-02"
 
@@ -27,6 +31,24 @@ type implementation struct {
 	task taskPkg.Interface
 }
 
+func updateLastIds(user string) {
+	muLastIds.Lock()
+	defer muLastIds.Unlock()
+
+	if _, ok := lastIds[user]; !ok {
+		lastIds[user] = 1
+	} else {
+		lastIds[user]++
+	}
+}
+
+func getLastIds(user string) uint {
+	muLastIds.RLock()
+	defer muLastIds.RUnlock()
+
+	return lastIds[user]
+}
+
 func (i *implementation) TaskCreate(_ context.Context, in *pb.TaskCreateRequest) (*pb.TaskCreateResponse, error) {
 	// parse dueDate
 	dueDateParsed, err := time.Parse(layoutISO, in.GetDueDate())
@@ -35,15 +57,11 @@ func (i *implementation) TaskCreate(_ context.Context, in *pb.TaskCreateRequest)
 	}
 
 	// update lastIds for current user
-	if _, ok := lastIds[in.GetUser()]; !ok {
-		lastIds[in.GetUser()] = 1
-	} else {
-		lastIds[in.GetUser()]++
-	}
+	updateLastIds(in.GetUser())
 
 	// create task
 	if err := i.task.Create(models.Task{
-		Id:      lastIds[in.GetUser()],
+		Id:      getLastIds(in.GetUser()),
 		User:    in.GetUser(),
 		Task:    in.GetTask(),
 		DueDate: dueDateParsed,
