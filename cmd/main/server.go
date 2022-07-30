@@ -45,7 +45,7 @@ func runREST() {
 
 	mux := http.NewServeMux()
 	mux.Handle("/", rmux)
-	mux.HandleFunc("/swagger.json", serveSwagger)
+	mux.HandleFunc("/docs", serveSwagger)
 
 	if err := http.ListenAndServe(":8080", mux); err != nil {
 		log.Fatal(err)
