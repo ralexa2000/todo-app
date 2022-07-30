@@ -74,12 +74,29 @@ func (i *implementation) TaskCreate(_ context.Context, in *pb.TaskCreateRequest)
 	return &pb.TaskCreateResponse{}, nil
 }
 
+func (i *implementation) TaskGet(_ context.Context, in *pb.TaskGetRequest) (*pb.TaskGetResponse, error) {
+	task, err := i.task.Get(in.GetUser(), uint(in.GetTaskId()))
+	if err != nil {
+		if errors.Is(err, cacheLocalPkg.ErrTaskNotExists) {
+			return nil, status.Error(codes.NotFound, err.Error())
+		}
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	return &pb.TaskGetResponse{
+		TaskId:  uint64(task.Id),
+		User:    task.User,
+		Task:    task.Task,
+		DueDate: task.DueDate.Format(layoutISO),
+	}, nil
+}
+
 func (i *implementation) TaskList(_ context.Context, in *pb.TaskListRequest) (*pb.TaskListResponse, error) {
 	tasks := i.task.List(in.GetUser())
 	result := make([]*pb.TaskListResponse_Task, 0, len(tasks))
 	for _, task := range tasks {
 		result = append(result, &pb.TaskListResponse_Task{
 			TaskId:  uint64(task.Id),
+			User:    task.User,
 			Task:    task.Task,
 			DueDate: task.DueDate.Format(layoutISO),
 		})

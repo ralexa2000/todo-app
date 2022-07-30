@@ -4,6 +4,7 @@ import (
 	botPkg "gitlab.ozon.dev/ralexa2000/todo-bot/internal/pkg/bot"
 	cmdAddPkg "gitlab.ozon.dev/ralexa2000/todo-bot/internal/pkg/bot/command/add"
 	cmdDeletePkg "gitlab.ozon.dev/ralexa2000/todo-bot/internal/pkg/bot/command/delete"
+	cmdGetPkg "gitlab.ozon.dev/ralexa2000/todo-bot/internal/pkg/bot/command/get"
 	cmdHelpPkg "gitlab.ozon.dev/ralexa2000/todo-bot/internal/pkg/bot/command/help"
 	cmdListPkg "gitlab.ozon.dev/ralexa2000/todo-bot/internal/pkg/bot/command/list"
 	cmdUpdatePkg "gitlab.ozon.dev/ralexa2000/todo-bot/internal/pkg/bot/command/update"
@@ -37,6 +38,9 @@ func registerBot(task taskPkg.Interface) botPkg.Interface {
 		commandAdd := cmdAddPkg.New(task)
 		bot.RegisterHandler(commandAdd)
 
+		commandGet := cmdGetPkg.New(task)
+		bot.RegisterHandler(commandGet)
+
 		commandList := cmdListPkg.New(task)
 		bot.RegisterHandler(commandList)
 
@@ -48,6 +52,7 @@ func registerBot(task taskPkg.Interface) botPkg.Interface {
 
 		commandHelp := cmdHelpPkg.New(map[string][2]string{
 			commandAdd.Name():    {commandAdd.Arguments(), commandAdd.Description()},
+			commandGet.Name():    {commandGet.Arguments(), commandGet.Description()},
 			commandList.Name():   {commandList.Arguments(), commandList.Description()},
 			commandUpdate.Name(): {commandUpdate.Arguments(), commandUpdate.Description()},
 			commandDelete.Name(): {commandDelete.Arguments(), commandDelete.Description()},

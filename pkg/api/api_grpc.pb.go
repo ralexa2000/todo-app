@@ -23,6 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AdminClient interface {
 	TaskCreate(ctx context.Context, in *TaskCreateRequest, opts ...grpc.CallOption) (*TaskCreateResponse, error)
+	TaskGet(ctx context.Context, in *TaskGetRequest, opts ...grpc.CallOption) (*TaskGetResponse, error)
 	TaskList(ctx context.Context, in *TaskListRequest, opts ...grpc.CallOption) (*TaskListResponse, error)
 	TaskUpdate(ctx context.Context, in *TaskUpdateRequest, opts ...grpc.CallOption) (*TaskUpdateResponse, error)
 	TaskDelete(ctx context.Context, in *TaskDeleteRequest, opts ...grpc.CallOption) (*TaskDeleteResponse, error)
@@ -39,6 +40,15 @@ func NewAdminClient(cc grpc.ClientConnInterface) AdminClient {
 func (c *adminClient) TaskCreate(ctx context.Context, in *TaskCreateRequest, opts ...grpc.CallOption) (*TaskCreateResponse, error) {
 	out := new(TaskCreateResponse)
 	err := c.cc.Invoke(ctx, "/ozon.dev.mc2.api.Admin/TaskCreate", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *adminClient) TaskGet(ctx context.Context, in *TaskGetRequest, opts ...grpc.CallOption) (*TaskGetResponse, error) {
+	out := new(TaskGetResponse)
+	err := c.cc.Invoke(ctx, "/ozon.dev.mc2.api.Admin/TaskGet", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -77,6 +87,7 @@ func (c *adminClient) TaskDelete(ctx context.Context, in *TaskDeleteRequest, opt
 // for forward compatibility
 type AdminServer interface {
 	TaskCreate(context.Context, *TaskCreateRequest) (*TaskCreateResponse, error)
+	TaskGet(context.Context, *TaskGetRequest) (*TaskGetResponse, error)
 	TaskList(context.Context, *TaskListRequest) (*TaskListResponse, error)
 	TaskUpdate(context.Context, *TaskUpdateRequest) (*TaskUpdateResponse, error)
 	TaskDelete(context.Context, *TaskDeleteRequest) (*TaskDeleteResponse, error)
@@ -89,6 +100,9 @@ type UnimplementedAdminServer struct {
 
 func (UnimplementedAdminServer) TaskCreate(context.Context, *TaskCreateRequest) (*TaskCreateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TaskCreate not implemented")
+}
+func (UnimplementedAdminServer) TaskGet(context.Context, *TaskGetRequest) (*TaskGetResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TaskGet not implemented")
 }
 func (UnimplementedAdminServer) TaskList(context.Context, *TaskListRequest) (*TaskListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TaskList not implemented")
@@ -126,6 +140,24 @@ func _Admin_TaskCreate_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AdminServer).TaskCreate(ctx, req.(*TaskCreateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Admin_TaskGet_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TaskGetRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServer).TaskGet(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ozon.dev.mc2.api.Admin/TaskGet",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServer).TaskGet(ctx, req.(*TaskGetRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -194,6 +226,10 @@ var Admin_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "TaskCreate",
 			Handler:    _Admin_TaskCreate_Handler,
+		},
+		{
+			MethodName: "TaskGet",
+			Handler:    _Admin_TaskGet_Handler,
 		},
 		{
 			MethodName: "TaskList",

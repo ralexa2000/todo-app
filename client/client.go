@@ -17,6 +17,7 @@ func main() {
 	client := pb.NewAdminClient(conn)
 
 	ctx := context.Background()
+
 	createResponse, err := client.TaskCreate(ctx, &pb.TaskCreateRequest{
 		User:    "test_user",
 		Task:    "clean my room",
@@ -26,6 +27,15 @@ func main() {
 		log.Fatal(err)
 	}
 	log.Printf("createResponse: [%v]", createResponse)
+
+	getResponse, err := client.TaskGet(ctx, &pb.TaskGetRequest{
+		User:   "test_user",
+		TaskId: 1,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("getResponse: [%v]", getResponse)
 
 	listResponse, err := client.TaskList(ctx, &pb.TaskListRequest{
 		User: "test_user",
