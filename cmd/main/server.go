@@ -27,17 +27,25 @@ func runGRPCServer(task taskPkg.Interface) {
 	}
 }
 
+func serveSwagger(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "swagger/api.swagger.json")
+}
+
 func runREST() {
 	ctx := context.Background()
 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	mux := runtime.NewServeMux()
+	rmux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-	if err := pb.RegisterAdminHandlerFromEndpoint(ctx, mux, ":8081", opts); err != nil {
+	if err := pb.RegisterAdminHandlerFromEndpoint(ctx, rmux, ":8081", opts); err != nil {
 		log.Fatal(err)
 	}
+
+	mux := http.NewServeMux()
+	mux.Handle("/", rmux)
+	mux.HandleFunc("/swagger.json", serveSwagger)
 
 	if err := http.ListenAndServe(":8080", mux); err != nil {
 		log.Fatal(err)
