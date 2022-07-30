@@ -27,15 +27,16 @@ message TaskCreateResponse {}
 // TaskList endpoint messages
 // ---------------------------------------------------------------------------------------------------------------------
 
-message TaskListRequest {}
+message TaskListRequest {
+  string user = 1;
+}
 message TaskListResponse {
   repeated Task Tasks = 1;
 
   message Task {
     uint64 taskId  = 1;
-    string user    = 2;
-    string task    = 3;
-    string dueDate = 4;
+    string task    = 2;
+    string dueDate = 3;
   }
 }
 
@@ -56,6 +57,7 @@ message TaskUpdateResponse {}
 // ---------------------------------------------------------------------------------------------------------------------
 
 message TaskDeleteRequest {
-  uint64 taskId = 1;
+  string user   = 1;
+  uint64 taskId = 2;
 }
 message TaskDeleteResponse {}
