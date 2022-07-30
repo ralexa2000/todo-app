@@ -12,15 +12,24 @@ import (
 )
 
 func main() {
-	runGRPCServer()
-}
-
-func runBot() {
 	var task taskPkg.Interface
 	{
 		task = taskPkg.New()
 	}
 
+	bot := registerBot(task)
+	go runBot(bot)
+	go runREST()
+	runGRPCServer(task)
+}
+
+func runBot(bot botPkg.Interface) {
+	if err := bot.Run(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func registerBot(task taskPkg.Interface) botPkg.Interface {
 	var bot botPkg.Interface
 	{
 		bot = botPkg.MustNew()
@@ -45,8 +54,5 @@ func runBot() {
 		})
 		bot.RegisterHandler(commandHelp)
 	}
-
-	if err := bot.Run(); err != nil {
-		log.Fatal(err)
-	}
+	return bot
 }

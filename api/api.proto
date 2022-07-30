@@ -6,10 +6,29 @@ option go_package = "gitlab.ozon.dev/ralexa2000/todo-main/pkg/api;api";
 import "google/api/annotations.proto";
 
 service Admin {
-  rpc TaskCreate(TaskCreateRequest) returns (TaskCreateResponse) {}
-  rpc TaskList(TaskListRequest) returns (TaskListResponse) {}
-  rpc TaskUpdate(TaskUpdateRequest) returns (TaskUpdateResponse) {}
-  rpc TaskDelete(TaskDeleteRequest) returns (TaskDeleteResponse) {}
+  rpc TaskCreate(TaskCreateRequest) returns (TaskCreateResponse) {
+    option (google.api.http) = {
+      post: "/v1/task"
+      body: "*"
+    };
+  }
+  rpc TaskList(TaskListRequest) returns (TaskListResponse) {
+    option (google.api.http) = {
+      get: "/v1/tasks/{user}"
+    };
+  }
+  rpc TaskUpdate(TaskUpdateRequest) returns (TaskUpdateResponse) {
+    option (google.api.http) = {
+      put: "/v1/task"
+      body: "*"
+    };
+  }
+  rpc TaskDelete(TaskDeleteRequest) returns (TaskDeleteResponse) {
+    option (google.api.http) = {
+      delete: "/v1/task"
+      body: "*"
+    };
+  }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

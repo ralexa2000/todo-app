@@ -18,7 +18,7 @@ func main() {
 
 	ctx := context.Background()
 	createResponse, err := client.TaskCreate(ctx, &pb.TaskCreateRequest{
-		User:    "ralexa2000",
+		User:    "test_user",
 		Task:    "clean my room",
 		DueDate: "2022-07-31",
 	})
@@ -28,7 +28,7 @@ func main() {
 	log.Printf("createResponse: [%v]", createResponse)
 
 	listResponse, err := client.TaskList(ctx, &pb.TaskListRequest{
-		User: "ralexa2000",
+		User: "test_user",
 	})
 	if err != nil {
 		log.Fatal(err)
@@ -37,7 +37,7 @@ func main() {
 
 	updateResponse, err := client.TaskUpdate(ctx, &pb.TaskUpdateRequest{
 		TaskId:  1,
-		User:    "ralexa2000",
+		User:    "test_user",
 		Task:    "clean my room",
 		DueDate: "2022-08-01",
 	})
@@ -47,7 +47,7 @@ func main() {
 	log.Printf("updateResponse: [%v]", updateResponse)
 
 	listResponse, err = client.TaskList(ctx, &pb.TaskListRequest{
-		User: "ralexa2000",
+		User: "test_user",
 	})
 	if err != nil {
 		log.Fatal(err)
@@ -56,7 +56,7 @@ func main() {
 
 	deleteResponse, err := client.TaskDelete(ctx, &pb.TaskDeleteRequest{
 		TaskId: 1,
-		User:   "ralexa2000",
+		User:   "test_user",
 	})
 	if err != nil {
 		log.Fatal(err)
@@ -64,7 +64,7 @@ func main() {
 	log.Printf("deleteResponse: [%v]", deleteResponse)
 
 	listResponse, err = client.TaskList(ctx, &pb.TaskListRequest{
-		User: "ralexa2000",
+		User: "test_user",
 	})
 	if err != nil {
 		log.Fatal(err)
