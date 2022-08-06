@@ -1,0 +1,9 @@
+services:
+  postgres:
+    image: postgres:14.4
+    environment:
+      POSTGRES_DB: "tasks"
+      POSTGRES_USER: "user"
+      POSTGRES_PASSWORD: "pwd"
+    ports:
+      - 5432:5432
