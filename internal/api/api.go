@@ -4,11 +4,12 @@ import (
 	"context"
 	"github.com/pkg/errors"
 	taskPkg "gitlab.ozon.dev/ralexa2000/todo-bot/internal/pkg/core/task"
-	cacheLocalPkg "gitlab.ozon.dev/ralexa2000/todo-bot/internal/pkg/core/task/cache/local"
 	"gitlab.ozon.dev/ralexa2000/todo-bot/internal/pkg/core/task/models"
+	"gitlab.ozon.dev/ralexa2000/todo-bot/internal/pkg/repository"
 	pb "gitlab.ozon.dev/ralexa2000/todo-bot/pkg/api"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"log"
 	"sync"
 	"time"
 )
@@ -69,7 +70,8 @@ func (i *implementation) TaskCreate(_ context.Context, in *pb.TaskCreateRequest)
 		if errors.Is(err, taskPkg.ErrValidation) {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
 		}
-		return nil, status.Error(codes.Internal, err.Error())
+		log.Println("INTERNAL ERROR:", err.Error())
+		return nil, status.Error(codes.Internal, "internal error")
 	}
 	return &pb.TaskCreateResponse{}, nil
 }
@@ -77,10 +79,11 @@ func (i *implementation) TaskCreate(_ context.Context, in *pb.TaskCreateRequest)
 func (i *implementation) TaskGet(_ context.Context, in *pb.TaskGetRequest) (*pb.TaskGetResponse, error) {
 	task, err := i.task.Get(in.GetUser(), uint(in.GetTaskId()))
 	if err != nil {
-		if errors.Is(err, cacheLocalPkg.ErrTaskNotExists) {
+		if errors.Is(err, repository.ErrTaskNotExists) {
 			return nil, status.Error(codes.NotFound, err.Error())
 		}
-		return nil, status.Error(codes.Internal, err.Error())
+		log.Println("INTERNAL ERROR:", err.Error())
+		return nil, status.Error(codes.Internal, "internal error")
 	}
 	return &pb.TaskGetResponse{
 		TaskId:  uint64(task.Id),
@@ -116,10 +119,11 @@ func (i *implementation) TaskUpdate(_ context.Context, in *pb.TaskUpdateRequest)
 	// find task by its id
 	task, err := i.task.Get(in.GetUser(), uint(in.GetTaskId()))
 	if err != nil {
-		if errors.Is(err, cacheLocalPkg.ErrTaskNotExists) {
+		if errors.Is(err, repository.ErrTaskNotExists) {
 			return nil, status.Error(codes.NotFound, err.Error())
 		}
-		return nil, status.Error(codes.Internal, err.Error())
+		log.Println("INTERNAL ERROR:", err.Error())
+		return nil, status.Error(codes.Internal, "internal error")
 	}
 
 	// update task
@@ -129,7 +133,8 @@ func (i *implementation) TaskUpdate(_ context.Context, in *pb.TaskUpdateRequest)
 		if errors.Is(err, taskPkg.ErrValidation) {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
 		}
-		return nil, status.Error(codes.Internal, err.Error())
+		log.Println("INTERNAL ERROR:", err.Error())
+		return nil, status.Error(codes.Internal, "internal error")
 	}
 
 	return &pb.TaskUpdateResponse{}, nil
@@ -139,10 +144,11 @@ func (i *implementation) TaskDelete(_ context.Context, in *pb.TaskDeleteRequest)
 	// find task by its id
 	task, err := i.task.Get(in.GetUser(), uint(in.GetTaskId()))
 	if err != nil {
-		if errors.Is(err, cacheLocalPkg.ErrTaskNotExists) {
+		if errors.Is(err, repository.ErrTaskNotExists) {
 			return nil, status.Error(codes.NotFound, err.Error())
 		}
-		return nil, status.Error(codes.Internal, err.Error())
+		log.Println("INTERNAL ERROR:", err.Error())
+		return nil, status.Error(codes.Internal, "internal error")
 	}
 
 	// delete task
@@ -150,7 +156,8 @@ func (i *implementation) TaskDelete(_ context.Context, in *pb.TaskDeleteRequest)
 		if errors.Is(err, taskPkg.ErrValidation) {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
 		}
-		return nil, status.Error(codes.Internal, err.Error())
+		log.Println("INTERNAL ERROR:", err.Error())
+		return nil, status.Error(codes.Internal, "internal error")
 	}
 
 	return &pb.TaskDeleteResponse{}, nil

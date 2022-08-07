@@ -70,7 +70,7 @@ func (c *command) Process(userName string, inputString string) string {
 		if errors.Is(err, taskPkg.ErrValidation) {
 			return "invalid args"
 		}
-		log.Printf("Internal Error: %s", err.Error())
+		log.Printf("INTERNAL ERROR: %s", err.Error())
 		return "internal error"
 	}
 

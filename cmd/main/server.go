@@ -31,12 +31,7 @@ func serveSwagger(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "swagger/api.swagger.json")
 }
 
-func runREST() {
-	ctx := context.Background()
-
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
+func runREST(ctx context.Context) {
 	rmux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 	if err := pb.RegisterAdminHandlerFromEndpoint(ctx, rmux, ":8081", opts); err != nil {

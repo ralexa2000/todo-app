@@ -5,7 +5,7 @@ import (
 	"github.com/pkg/errors"
 	commandPkg "gitlab.ozon.dev/ralexa2000/todo-bot/internal/pkg/bot/command"
 	taskPkg "gitlab.ozon.dev/ralexa2000/todo-bot/internal/pkg/core/task"
-	cacheLocalPkg "gitlab.ozon.dev/ralexa2000/todo-bot/internal/pkg/core/task/cache/local"
+	"gitlab.ozon.dev/ralexa2000/todo-bot/internal/pkg/repository"
 	"log"
 	"regexp"
 	"strconv"
@@ -52,10 +52,10 @@ func (c *command) Process(userName string, inputString string) string {
 	// find task by its id
 	task, err := c.task.Get(userName, uint(taskIdParsed))
 	if err != nil {
-		if errors.Is(err, cacheLocalPkg.ErrTaskNotExists) {
+		if errors.Is(err, repository.ErrTaskNotExists) {
 			return fmt.Sprintf("task with id <%d> does not exist", taskIdParsed)
 		}
-		log.Printf("Internal Error: %s", err.Error())
+		log.Printf("INTERNAL ERROR: %s", err.Error())
 		return "internal error"
 	}
 
@@ -64,7 +64,7 @@ func (c *command) Process(userName string, inputString string) string {
 		if errors.Is(err, taskPkg.ErrValidation) {
 			return "invalid args"
 		}
-		log.Printf("Internal Error: %s", err.Error())
+		log.Printf("INTERNAL ERROR: %s", err.Error())
 		return "internal error"
 	}
 
