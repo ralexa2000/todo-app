@@ -20,7 +20,7 @@ var (
 type Interface interface {
 	Create(task models.Task) error
 	Update(task models.Task) error
-	List(userName string) []models.Task
+	List(userName string, limit, offset uint32) []models.Task
 	Delete(task models.Task) error
 	Get(userName string, taskId uint) (models.Task, error)
 	String(task models.Task) string
@@ -72,8 +72,8 @@ func (c *core) Update(task models.Task) error {
 	return nil
 }
 
-func (c *core) List(userName string) []models.Task {
-	return c.repo.TaskList(c.ctx, userName)
+func (c *core) List(userName string, limit, offset uint32) []models.Task {
+	return c.repo.TaskList(c.ctx, userName, limit, offset)
 }
 
 func (c *core) Delete(task models.Task) error {

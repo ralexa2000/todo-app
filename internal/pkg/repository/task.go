@@ -79,11 +79,14 @@ func (r *Repository) TaskDelete(ctx context.Context, task *models.Task) error {
 	return nil
 }
 
-func (r *Repository) TaskList(ctx context.Context, username string) []models.Task {
+func (r *Repository) TaskList(ctx context.Context, username string, limit, offset uint32) []models.Task {
 	log.Printf("Selecting tasks for username [%s]", username)
-	query := "SELECT username, task_id, task, due_date FROM public.tasks WHERE username = $1"
+	query := fmt.Sprintln(
+		"SELECT username, task_id, task, due_date FROM public.tasks WHERE username = $1",
+		"ORDER BY due_date LIMIT $2 OFFSET $3",
+	)
 	var tasks []models.Task
-	if err := pgxscan.Select(ctx, r.pool, &tasks, query, username); err != nil {
+	if err := pgxscan.Select(ctx, r.pool, &tasks, query, username, limit, offset); err != nil {
 		log.Printf("INTERNAL ERROR: Repository.TaskList: username [%s], err: %s", username, err.Error())
 		return []models.Task{}
 	}

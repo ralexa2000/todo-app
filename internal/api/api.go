@@ -19,7 +19,10 @@ var (
 	muLastIds = sync.RWMutex{}
 )
 
-const layoutISO = "2006-01-02"
+const (
+	layoutISO        = "2006-01-02"
+	listLimitDefault = 10
+)
 
 func New(task taskPkg.Interface) pb.AdminServer {
 	return &implementation{
@@ -94,7 +97,11 @@ func (i *implementation) TaskGet(_ context.Context, in *pb.TaskGetRequest) (*pb.
 }
 
 func (i *implementation) TaskList(_ context.Context, in *pb.TaskListRequest) (*pb.TaskListResponse, error) {
-	tasks := i.task.List(in.GetUser())
+	limit := in.GetLimit()
+	if limit == 0 {
+		limit = listLimitDefault
+	}
+	tasks := i.task.List(in.GetUser(), limit, in.GetOffset())
 	result := make([]*pb.TaskListResponse_Task, 0, len(tasks))
 	for _, task := range tasks {
 		result = append(result, &pb.TaskListResponse_Task{
