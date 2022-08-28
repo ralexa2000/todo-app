@@ -1,15 +1,17 @@
-# Todo bot
+### Todo list service
+(simple CRUD functionality, postgresql as a database)
 
-Telegram todo bot
 
-You can add, update, delete or list your tasks!
+Interfaces:
+- GRPC
+- HTTP (GRPC-gateway)
+- Telegram bot
 
-`/help` - list all commands
+Telegram bot commands:
 
-`/list` - list all current tasks
-
-`/add <due_date> <task>` - add a new task, due date: `YYYY-MM-DD`
-
-`/update <task_id> <due_date> <task>` - update task with id, due date: `YYYY-MM-DD`
-
-`/delete <task_id>` - delete task with id
+- `/help` - list all commands
+- `/get <task_id>` - get task with id
+- `/list` - list all current tasks
+- `/update <task_id> <due_date:YYYY-MM-DD> <task>` - update task with id
+- `/delete <task_id>` - delete task with id
+- `/add <due_date:YYYY-MM-DD> <task>` - add a new task
